@@ -78,31 +78,17 @@ bot.hears('📁 Source code', (ctx) => {
   )
 })
 
-// bot.on('text', async (ctx) => {
-//   if (ctx.message.text.length > 900) {
-//     return ctx.reply('Your text is too long. Please send text that contains not more than 900 symbols.')
-//   }
+// try{
+//   files = await fsPromises.readdir(commandsLocation);
+// }catch(err){
+//   console.log("Failed while commands are beign readed");
+//   console.log(err);
+//   return {};
+// }
 
-//   ctx.replyWithChatAction('upload_photo')
-
-//   axios.get(`http://api.qrserver.com/v1/create-qr-code/?data=${encodeURI(ctx.message.text)}&size=300x300`)
-//     .then(async (response) => {
-//       await ctx.replyWithPhoto(`http://api.qrserver.com/v1/create-qr-code/?data=${encodeURI(ctx.message.text)}&size=300x300`, { caption: 'Generated via @OneQRBot' })
-//       ctx.reply('You can send me another text or tap "⬅️ Back"')
-    
-//       updateStat('generating')
-//       updateUser(ctx, true)
-//     })
-//     .catch(async (err) => {
-//       console.log(err)
-//       await ctx.reply('Data you sent isn`t valid. Please check that and try again.')
-//       ctx.reply('You can send me another text or tap "⬅️ Back"')
-
-//       sendError(`Generating error by message ${ctx.message.text}: \n\n ${err.toString()}`, ctx)
-//     })  
-// })
 
 const getMyId = async(ctx)=>{
+
   const telegramId = ctx.message.chat.id
   if (ctx.message.text.length > 900) {
     return ctx.reply('Your text is too long. Please send text that contains not more than 900 symbols.')

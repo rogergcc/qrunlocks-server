@@ -23,7 +23,7 @@ The objective is to be able to accept access to correctly identified users. You 
 - Kotlin (Android)
 
 # On how to use
-https://youtu.be/QlIWDNqsV5U
+-
 
 # Important Links
 
