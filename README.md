@@ -17,7 +17,7 @@ The objective is to be able to accept access to correctly identified users. You 
 - Axios (HTTP request)
 - NodeJS
 - Telegram Bot
-- Netlify (Deploy)
+- Heroku (Deploy Bot)
 
 ### Front
 - Kotlin (Android)
@@ -28,7 +28,7 @@ The objective is to be able to accept access to correctly identified users. You 
 # Important Links
 
 
-Live 🌐: [qrunlock](https://qrunlock.netlify.app/)
+Live 🌐: [qrunlock](https://t.me/QRUnlockBot)
 
 Github : [qrunlock](https://github.com/rogergcc/qrunlocks-server)
 
