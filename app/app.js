@@ -70,7 +70,7 @@ bot.command("start", async (ctx) => {
     "Register and attendance to Events",
     Markup.keyboard([
       ["🔍 Event Details", "🎫 Register Event"], // Row1 with 2 buttons
-      ["🔑 My Qr", "📁 Source code"], // Row2 with 2 buttons
+      ["🔑 My QR", "📁 Source code"], // Row2 with 2 buttons
     ])
       .oneTime()
       .resize()
@@ -78,17 +78,30 @@ bot.command("start", async (ctx) => {
 });
 
 bot.hears("🔍 Event Details", (ctx) =>
-  ctx.reply(
-    "Detalles evento https://app.mural.co/t/blogteam1386/m/blogteam1386/1657604514012/38f154001e2cc9715e45b8d966951e203c771238?sender=u7f3fb39964fc58ef35d50069!"
-  )
+  // ctx.reply( "And example of a Event Info" +
+  //   "https://eventhasnodeplanetscale.netlify.app"
+  // )
+
+  ctx.reply("And example of a Event Info", {
+    reply_markup: {
+      inline_keyboard: [
+        [
+          {
+            text: "🔗 Event",
+            url: "https://eventhasnodeplanetscale.netlify.app",
+          },
+        ],
+      ],
+    },
+  })
 );
-bot.hears("🎫 Register Event", (ctx) => registerUser(ctx));
+bot.hears("🎫 Register Event", async(ctx) => await registerUser(ctx));
 // bot.hears('🔑 My Qr', ctx => ctx.reply('Qr de ! '+ctx.message.chat.id))
-bot.hears("🔑 My Qr", (ctx) => getMyId(ctx));
+bot.hears("🔑 My QR", async (ctx) => await getMyQrCode(ctx));
 // bot.hears('📞 Datos', ctx => ctx.reply('ver mis datoa!'))
 
 bot.hears("📁 Source code", (ctx) => {
-  ctx.reply("You can see code of this bot on GitHub. Thanks for stars!", {
+  ctx.reply("@PlanetScale and @Hashnode hosting this hackathon \n You can see code of this bot on GitHub. Thanks for stars!", {
     reply_markup: {
       inline_keyboard: [
         [
@@ -116,119 +129,49 @@ const registerUser = async (ctx)=>{
   const last_name = userChat.last_name+"".replace(/(['"])/g, "\\$1");
   const chat_id  =userChat.id
 
-  console.log(first_name)
-
   try {
     const userControllerResponse = await userController.create({chat_id,first_name,last_name})
     // const user = await userService.create({chat_id,first_name,last_name})
 
-    console.log('userCreate '+ userControllerResponse)
+    console.log('userControllerResponse '+ JSON.stringify(userControllerResponse))
+    
+    
     ctx.reply(userControllerResponse.message)
+    if(userControllerResponse.affectedRows==true)
+      await getMyQrCode(ctx)
+
   } catch (err) {
     console.error(`Error while creating User`, err.message);
     ctx.reply("Error while creating User")
   }
   
 }
-const getMyId = async (ctx) => {
+const getMyQrCode = async (ctx) => {
   const telegramId = ctx.message.chat.id;
-  console.log("get data")
 
+  //let codeQrGenerate = {}
+  const codeQrGenerate = JSON.stringify({userId:telegramId+""})
+  // const codeQrGenerate = {userId:telegramId+""}
+
+  const urlQrManage= "https://api.qrserver.com/v1/create-qr-code/?data="+codeQrGenerate+"&size=300x300"
+  console.log("URL: "+ urlQrManage)
   if (ctx.message.text.length > 900) {
     return ctx.reply(
       "Your text is too long. Please send text that contains not more than 900 symbols."
     );
   }
-  // ctx.reply(telegramId)
-  ctx.replyWithChatAction("upload_photo");
 
-  axios
-    .get(
-      `http://api.qrserver.com/v1/create-qr-code/?data=${telegramId}&size=300x300`
-    )
-    .then(async (response) => {
-      await ctx.replyWithPhoto(
-        `http://api.qrserver.com/v1/create-qr-code/?data=${telegramId}&size=300x300`,
-        { caption: "My Code for Event " }
-      );
-      // ctx.reply('You can send me another text or tap "⬅️ Back"');
-    })
-    .catch(async (err) => {
-      console.log("catch error: " + err);
-      await ctx.reply(
-        "Data you sent isn`t valid. Please check that and try again."
-      );
-      ctx.reply('You can send me another text or tap "⬅️ Back"');
+  await ctx.replyWithPhoto(
+    { url: urlQrManage },
+    // urlQrManage+"",
+    { caption: "Qr Id for Event" }
+  );
 
-      sendError(
-        `Generating error by message ${
-          ctx.message.text
-        }: \n\n ${err.toString()}`,
-        ctx
-      );
-    });
+
 
   // return ctx.message.chat.id
 };
 
-function updateUser(ctx, active) {
-  let jetzt = active ? "active" : "blocked";
-  db.collection("allUsers").updateOne(
-    { userId: ctx.from.id },
-    { $set: { status: jetzt } },
-    { upsert: true, new: true }
-  );
-}
-
-function updateStat(action) {
-  if (action == "button") {
-    return db
-      .collection("statistic")
-      .updateOne(
-        { genAct: action },
-        { $inc: { count: 1 } },
-        { new: true, upsert: true }
-      );
-  }
-
-  db.collection("statistic").updateOne(
-    { action: action },
-    { $inc: { [makeDate()]: 1 } },
-    { new: true, upsert: true }
-  );
-  db.collection("statistic").updateOne(
-    { genAct: action },
-    { $inc: { count: 1 } },
-    { new: true, upsert: true }
-  );
-}
-
-// Login widget events
-bot.on("connected_website", (ctx) => ctx.reply("Website connected"));
-
-// bot.command('special', (ctx) => {
-//   return ctx.reply(
-//     'Special buttons keyboard',
-//     Markup.keyboard([
-//       Markup.button.contactRequest('Send contact'),
-//       Markup.button.locationRequest('Send location')
-//     ]).resize()
-//   )
-// })
-
-bot.command("caption", (ctx) => {
-  return ctx.replyWithPhoto(
-    { url: "https://picsum.photos/200/300/?random" },
-    {
-      caption: "Caption",
-      parse_mode: "Markdown",
-      // ...Markup.inlineKeyboard([
-      //   Markup.button.callback('Plain', 'plain'),
-      //   Markup.button.callback('Italic', 'italic')
-      // ])
-    }
-  );
-});
 
 bot.settings(async (ctx) => {
   await ctx.setMyCommands([
@@ -252,6 +195,19 @@ bot.launch();
 process.once("SIGINT", () => bot.stop("SIGINT"));
 process.once("SIGTERM", () => bot.stop("SIGTERM"));
 
+async function start(token) {
+  telegramBot = new TelegramBot(token);
+  await telegramBot.startPolling({ restart: true });
+}
+
+async function stop() {
+  if (telegramBot != null) {
+    await telegramBot.stopPolling({ cancel: true });
+    telegramBot = null;
+  }
+  process.exit();
+}
+
 // error handler middleware
 App.use(function (err, req, res, next) {
   console.error(err.stack)
@@ -261,4 +217,6 @@ App.use(function (err, req, res, next) {
     body: {}
   });
 })
+
+
 module.exports = App;

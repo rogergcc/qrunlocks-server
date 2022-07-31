@@ -33,11 +33,11 @@ exports.create = async (req) => {
    }
    
     const responseCreateUser = await User.create(newUser)
-    console.log('=>Contoller responseCreateUser'+ JSON.stringify(responseCreateUser))
+    // console.log('=>Contoller responseCreateUser'+ JSON.stringify(responseCreateUser))
 
     response.status = 200
     response.message = responseCreateUser.message
-
+    response.affectedRows=1
     response.body = responseCreateUser
 
    

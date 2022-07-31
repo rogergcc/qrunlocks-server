@@ -48,7 +48,7 @@ class User {
        
        if (findRows.length>0) {
          affectedRows=true
-         message = "Usera already registered ";
+         message = "User already registered ";
        }
    
        return { findRows,message,affectedRows };
