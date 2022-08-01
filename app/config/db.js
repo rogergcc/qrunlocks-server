@@ -7,7 +7,10 @@ async function query(sql, params) {
       host: config.HOST,
       user: config.USER,
       password: config.PASSWORD,
-      database: config.DB
+      database: config.DB,
+      ssl : {
+        rejectUnauthorized: false
+      }
     }
   );
   const [results, ] = await connection.execute(sql, params);
