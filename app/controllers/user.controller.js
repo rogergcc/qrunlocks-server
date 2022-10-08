@@ -1,5 +1,17 @@
 const User = require("../models/user.model.js");
 
+
+// const getLanguages = async (req, res) => {
+//   try {
+//       const connection = await getConnection();
+//       const result = await connection.query("SELECT id, name, programmers FROM language");
+//       res.json(result);
+//   } catch (error) {
+//       res.status(500);
+//       res.send(error.message);
+//   }
+// };
+
 // Create and Save a new User
 exports.create = async (req) => {
   // Validate request
@@ -51,15 +63,39 @@ exports.create = async (req) => {
 
 exports.findAll = async (req, res) => {
   const title = req.query.title;
+  let response={}
+  try {
+    const getAllUsers = await User.getAll(title)
+    if (getAllUsers.affectedRows) {
+      response.status = 200;
+    } else {
+      response.status = 404;
+    }
 
-  User.getAll(title, (err, data) => {
-    if (err)
-      res.status(500).send({
-        message:
-          err.message || "Some error occurred while retrieving tutorials.",
-      });
-    else res.send(data);
-  });
+    response.message = getAllUsers.message;
+    response.body = getAllUsers;
+
+    return res.status(response.status).send(response);
+  } catch (error) {
+    response.status = 500;
+    console.log("Something went wrong", error);
+    response.message = error.message;
+  }
+  
+  // await User.getAll(title, (err, data) => {
+  //   if (err)
+  //     res.status(500).send({
+  //       message:
+  //         err.message || "Some error occurred while retrieving tutorials.",
+  //     });
+  //   else res.send(data)
+  // });
+
+  // const { ok, result, error } = await User.getAll(title);
+  //   if (!ok) {
+  //     next(error)
+  //   } 
+  //   return res.send(result);
 };
 
 // Find a single User by Id

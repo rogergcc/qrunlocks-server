@@ -3,18 +3,28 @@ const express = require("express");
 const path = require("path");
 const cors = require("cors");
 const axios = require("axios");
-const TOKEN = process.env.BOT_TOKEN;
+const TOKEN = process.env.BOT_TOKEN
 
+
+const HOST= process.env.HOST
 const App = express();
+const AttendaceRoute = require('./routes/attendance.routes')
 App.use(express.static(path.join(__dirname, "../public")));
 
-const AttendaceRoute = require('./routes/attendance.routes')
+// var corsOptions = {
+//   origin: `http://localhost:8081${HOST}`
+// };
 
-const userController = require("./controllers/user.controller.js");
+
+
+App.use(cors())
 
 // App.use(express.static('public'))
 App.use(express.json());
 App.use(express.urlencoded({ extended: false }));
+
+// parse requests of content-type - application/x-www-form-urlencoded
+//App.use(express.urlencoded({ extended: true })); /* bodyParser.urlencoded() is deprecated */
 
 
 
@@ -25,7 +35,11 @@ const bot = new Telegraf(TOKEN);
 
 bot.use(Telegraf.log());
 
-App.use(cors());
+
+
+
+const userController = require("./controllers/user.controller.js");
+
 
 const versionOne = (routeName) => `/api/v1/${routeName}`
 
@@ -42,8 +56,9 @@ App.post("/webhooks/telegram", (req, res, next) => {
 });
 
 // require("./routes/attendance.routes.js")(App);
+require("./routes/user.routes.js")(App)
 
-App.use('/api/v1/attendance', AttendaceRoute);
+App.use('/api/v1/attendance', AttendaceRoute)
 // App.use('/user', User);
 // App.use(versionOne('attendance'), AttendaceRoute)
 App.post("/sendMessage", (req, res, next) => {

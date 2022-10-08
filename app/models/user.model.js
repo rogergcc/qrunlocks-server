@@ -1,4 +1,4 @@
-const sql = require("../../app/config/db");
+const connectionDb = require("../../app/config/db");
 const helper= require("./helper")
 // constructor
 class User {
@@ -12,7 +12,7 @@ class User {
    
 
     try {
-      const result = await sql.query(
+      const result = await connectionDb.query(
          `INSERT INTO user 
             (chat_id, first_name, last_name) 
             VALUES 
@@ -36,7 +36,7 @@ class User {
 
   static async findById(chat_id) {
    try {
-      const result = await sql.query(
+      const result = await connectionDb.query(
          `SELECT * FROM user WHERE chat_id = ${chat_id}`
        );
    
@@ -61,23 +61,33 @@ class User {
 
   }
 
-  static getAll(title, result) {
-    let query = "SELECT * FROM users";
+  static async getAll(title) {
+    
+    try {
+      let query = "SELECT *FROM user WHERE status=1";
 
-    if (title) {
-      query += ` WHERE title LIKE '%${title}%'`;
+      if (title) {
+        query = query+` and chat_id LIKE '%${title}%' `;
+      }
+      const result = await connectionDb.query(query)
+   
+       let message = "Not found";
+      
+       let findRows=[]
+       let affectedRows=false
+       findRows = helper.emptyOrRows(result);
+       
+       if (findRows.length>0) {
+         affectedRows=true
+         message = "get ";
+       }
+   
+       return { findRows,message,affectedRows };
+    } catch (error) {
+      console.log("Something went wrong: find user", error);
+      throw new Error(error);
     }
 
-    sql.query(query, (err, res) => {
-      if (err) {
-        console.log("error: ", err);
-        result(null, err);
-        return;
-      }
-
-      console.log("users: ", res);
-      result(null, res);
-    });
   }
 }
 
