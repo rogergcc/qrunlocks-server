@@ -10,5 +10,5 @@ module.exports = app => {
    router.get("/:id", users.findOne)
  
 
-   app.use('/api/users', router)
+   app.use('/api/v1/users', router)
  };
