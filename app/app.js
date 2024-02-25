@@ -49,6 +49,16 @@ App.get("/", (req, res, next) => {
   res.send("INDEX ");
 });
 
+
+App.get(versionOne(''), (req, res, next) => {
+  // console.log(req.body);
+
+  res.send("Index Api V1");
+
+});
+
+http://localhost:7002/api/v1/
+
 App.post("/webhooks/telegram", (req, res, next) => {
   console.log("webhooks/telegram: " + req.body);
 

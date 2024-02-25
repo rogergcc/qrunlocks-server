@@ -35,26 +35,39 @@ class User {
   }
 
   static async findById(chat_id) {
+    let findRows=[]
+    let affectedRows=false
+    let message = ""
    try {
-      const result = await connectionDb.query(
-         `SELECT * FROM user WHERE chat_id = ${chat_id}`
-       );
-   
-       let message = "Not found";
+     console.log('[user.model] findById INIT')
+      console.log('query')
+      const query = `SELECT * FROM user WHERE chat_id = '${chat_id}'`
+      console.log(query);
+      const result = await connectionDb.query(query)
+
+      console.log('result')
+      console.log(result)
       
-       let findRows=[]
-       let affectedRows=false
+      
+      
+      
        findRows = helper.emptyOrRows(result);
        
        if (findRows.length>0) {
          affectedRows=true
-         message = "User already registered ";
+         message = "User is already registered";
+       }
+       else{
+         affectedRows=false
+         message = "User not Found";
        }
    
        return { findRows,message,affectedRows };
     } catch (error) {
-      console.log("Something went wrong: find user", error);
-      throw new Error(error);
+  
+      message = `something ocurre finding user: ${error.message}`
+      // throw new Error(error);
+      return { findRows, message,affectedRows }
     }
 
    

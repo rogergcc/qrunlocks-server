@@ -2,84 +2,87 @@ const Attendance = require("../models/attendance.model.js");
 const User = require("../models/user.model.js");
 
 // Create and Save a new User
-module.exports.create = async (req,res) => {
-  // Validate request
-  //   if (!req.body) {
-  //     res.status(400).send({
-  //       message: "Content can not be empty!"
-  //     });
-  //   }
-
-  // Create a User
-  
-
- 
-  let response={}
+module.exports.create = async (req, res) => {
+  let response = {};
   try {
+    // Validate request
+    const requestBody = req.body;
+
+    if (!requestBody || Object.keys(requestBody).length === 0) {
+      response.status = 400;
+      response.message = "Content can not be empty!";
+
+      return res.status(response.status).send(response);
+    }
+
+    // Create a User
+
+
+    //verificar si el USUARIO EXISTEN EN EL SISTEMA -  esta registrado ?
+    const userExists = await User.findById(requestBody.chat_id);
+    console.log('userExists'+ JSON.stringify(userExists))
+    
+    if (userExists.affectedRows==false) {
+      response.status = 404;
+      response.message = userExists.message;
+
+      response.body = userExists;
+      console.log("[attendance.Controller] userExists" + JSON.stringify(userExists))
+      // return response;
+      return res.status(response.status).send(response);
+    }
+
     const attendance = new Attendance({
       chat_id: req.body.chat_id,
       event_id: req.body.event_id,
     });
-
-    //verificar si el USUARIO EXISTEN EN EL SISTEMA -  esta registrado ?
-    const userExists = await User.findById(req.chat_id);
-    if (userExists.affectedRows) {
-      response.status = 404
-      response.message = userExists.message;
-
-      response.body = userExists;
-      console.log("=>Contoller userExists" + JSON.stringify(userExists));
-      return response;
-    }
-
     //verificar si EL USUARO YA REGISTRO SU ASISTENCIA CON SU QR Id
     const userAlreadyAttendaceRegister = await Attendance.findByChatId(
       attendance.chat_id
     );
     if (userAlreadyAttendaceRegister.affectedRows) {
-      response.status = 404
+      response.status = 404;
       response.message = userAlreadyAttendaceRegister.message;
       response.body = userAlreadyAttendaceRegister;
       return res.status(response.status).send(response);
     }
+
     //REGISTRAR ASISTENCIA
     const responseRegisterUserAttendance = await Attendance.create(attendance);
-
     response.status = 200;
     response.message = responseRegisterUserAttendance.message;
-
     response.body = responseRegisterUserAttendance;
 
     return res.status(response.status).send(response);
+
     // return res.send(response);
   } catch (error) {
     console.log("Something went wrong", error);
     response.status = 500;
     response.message = error.message;
+
+    return res.status(response.status).send(response);
   }
   // return res.status(response.status).send(response)
 };
 
 exports.findAll = async (req, res) => {
-
-  let response={}
+  let response = {};
   const title = req.query.title;
   try {
-    const attendaceGetAll = await Attendance.getAll(title)
-    if (attendaceGetAll.affectedRows) response.status = 200
+    const attendaceGetAll = await Attendance.getAll(title);
+    if (attendaceGetAll.affectedRows) response.status = 200;
     else response.status = 404;
 
-    response.message = attendaceGetAll.message
-    response.body = attendaceGetAll
+    response.message = attendaceGetAll.message;
+    response.body = attendaceGetAll;
 
-    return res.status(response.status).send(response)
+    return res.status(response.status).send(response);
   } catch (error) {
     response.status = 500;
-    console.log("Something went wrong", error)
-    response.message = error.message
+    console.log("Something went wrong", error);
+    response.message = error.message;
   }
-
-  
 
   // Attendance.getAll(title, (err, data) => {
   //   if (err)
@@ -93,28 +96,26 @@ exports.findAll = async (req, res) => {
 
 // Find a single User by Id
 exports.findOne = async (req, res) => {
-  let response={}
+  let response = {};
   try {
-     const userAlreadyAttendaceRegister = await Attendance.findByChatId(req.params.id)
-     if(userAlreadyAttendaceRegister.affectedRows){
-        response.status = 200
-      
-  
-     }else{
-      response.status = 404
-      
-      }
-
-      response.message = userAlreadyAttendaceRegister.message
-      response.body = userAlreadyAttendaceRegister
-
-      return res.status(response.status).send(response)
-
-    } catch (error) {
-      response.status = 500
-      console.log("Something went wrong", error);
-      response.message = error.message;
+    const userAlreadyAttendaceRegister = await Attendance.findByChatId(
+      req.params.id
+    );
+    if (userAlreadyAttendaceRegister.affectedRows) {
+      response.status = 200;
+    } else {
+      response.status = 404;
     }
+
+    response.message = userAlreadyAttendaceRegister.message;
+    response.body = userAlreadyAttendaceRegister;
+
+    return res.status(response.status).send(response);
+  } catch (error) {
+    response.status = 500;
+    console.log("Something went wrong", error);
+    response.message = error.message;
+  }
 
   // Attendance.findByChatId(req.params.id, (err, data) => {
   //   if (err) {
