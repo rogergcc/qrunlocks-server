@@ -48,14 +48,12 @@ class User {
       console.log('result')
       console.log(result)
       
-      
-      
-      
+  
        findRows = helper.emptyOrRows(result);
        
        if (findRows.length>0) {
          affectedRows=true
-         message = "User is already registered";
+         message = "User Founded";
        }
        else{
          affectedRows=false
@@ -84,7 +82,7 @@ class User {
       }
       const result = await connectionDb.query(query)
    
-       let message = "Not found";
+       let message = "Users Not found";
       
        let findRows=[]
        let affectedRows=false

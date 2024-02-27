@@ -17,37 +17,42 @@ module.exports.create = async (req, res) => {
 
     // Create a User
 
-
-    //verificar si el USUARIO EXISTEN EN EL SISTEMA -  esta registrado ?
-    const userExists = await User.findById(requestBody.chat_id);
-    console.log('userExists'+ JSON.stringify(userExists))
     
-    if (userExists.affectedRows==false) {
-      response.status = 404;
-      response.message = userExists.message;
 
-      response.body = userExists;
-      console.log("[attendance.Controller] userExists" + JSON.stringify(userExists))
+    //#region Verificar el USUARIO EXISTEN EN EL SISTEMA -  esta registrado ?
+    const userFounded = await User.findById(requestBody.chat_id);
+    console.log('userExists'+ JSON.stringify(userFounded))
+    
+    if (userFounded.affectedRows==false) {
+      response.status = 404;
+      response.message = userFounded.message;
+
+      response.body = userFounded;
+      console.log("[attendance.Controller] userFounded" + JSON.stringify(userFounded))
       // return response;
       return res.status(response.status).send(response);
     }
+    //#endregion
+    
 
+    //#region REGION Verifica  EL USUARO YA REGISTRO SU ASISTENCIA CON SU QR Id
+    const userRegisterAttendanceFounded = await Attendance.findByChatId(
+      req.body.chat_id
+    );
+    if (userRegisterAttendanceFounded.affectedRows) {
+      response.status = 404;
+      response.message = userRegisterAttendanceFounded.message;
+      response.body = userRegisterAttendanceFounded;
+      return res.status(response.status).send(response);
+    }
+    //#endregion
+
+    //REGISTRAR ASISTENCIA
     const attendance = new Attendance({
       chat_id: req.body.chat_id,
       event_id: req.body.event_id,
-    });
-    //verificar si EL USUARO YA REGISTRO SU ASISTENCIA CON SU QR Id
-    const userAlreadyAttendaceRegister = await Attendance.findByChatId(
-      attendance.chat_id
-    );
-    if (userAlreadyAttendaceRegister.affectedRows) {
-      response.status = 404;
-      response.message = userAlreadyAttendaceRegister.message;
-      response.body = userAlreadyAttendaceRegister;
-      return res.status(response.status).send(response);
-    }
+    })
 
-    //REGISTRAR ASISTENCIA
     const responseRegisterUserAttendance = await Attendance.create(attendance);
     response.status = 200;
     response.message = responseRegisterUserAttendance.message;

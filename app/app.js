@@ -31,11 +31,10 @@ App.use(express.urlencoded({ extended: false }));
 if (TOKEN === undefined) {
   throw new Error("BOT_TOKEN must be provided!");
 }
+
 const bot = new Telegraf(TOKEN);
 
 bot.use(Telegraf.log());
-
-
 
 
 const userController = require("./controllers/user.controller.js");
@@ -60,7 +59,8 @@ App.get(versionOne(''), (req, res, next) => {
 http://localhost:7002/api/v1/
 
 App.post("/webhooks/telegram", (req, res, next) => {
-  console.log("webhooks/telegram: " + req.body);
+  
+  console.log("webhooks/telegram: " + JSON.stringify(req.body))
 
   res.send({ status: "ok" });
 });
@@ -71,13 +71,14 @@ require("./routes/user.routes.js")(App)
 App.use('/api/v1/attendance', AttendaceRoute)
 // App.use('/user', User);
 // App.use(versionOne('attendance'), AttendaceRoute)
-App.post("/sendMessage", (req, res, next) => {
+App.post("/sendMessage", async (req, res, next) => {
   console.log("sendMessage: " + req.body);
   const { chat_id, text } = req.body;
 
   // bot.telegram.sendMessage(ctx.chat.id, "Bienvenido al Bot POKEmons");
-  bot.telegram.sendMessage(chat_id, "MSG local DEV " + text);
-  res.send({ status: "enviado?" });
+  const sendInfo= await bot.telegram.sendMessage(chat_id, "[DEV] sendMessage() " + text);
+  
+  res.send({ status: "enviado sendmessage" });
 });
 
 App.post("/verificar", (req, res, next) => {
@@ -85,8 +86,8 @@ App.post("/verificar", (req, res, next) => {
   const { chat_id, text } = req.body;
 
   // bot.telegram.sendMessage(ctx.chat.id, "Bienvenido al Bot POKEmons");
-  bot.telegram.sendMessage(chat_id, "MSG local DEV " + text);
-  res.send({ status: "enviado?" });
+  bot.telegram.sendMessage(chat_id, "MSG local DEV verificar" + text);
+  res.send({ status: "enviado verificado" });
 });
 
 

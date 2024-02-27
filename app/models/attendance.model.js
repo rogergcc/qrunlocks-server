@@ -47,7 +47,7 @@ class Attendance {
         `SELECT * FROM attendance WHERE chat_id = ${chat_id}`
       );
 
-      let message = "Not found";
+      let message = "";
 
       let findRows = [];
       let affectedRows = false;
@@ -55,12 +55,16 @@ class Attendance {
 
       if (findRows.length > 0) {
         affectedRows = true;
-        message = "User found";
+        message = "[Attendance] User found in Attendace Register";
+      }
+      else{
+        affectedRows=false
+        message= '[Attendance] User Not found in Attendace Register'
       }
 
       return { findRows, message, affectedRows };
     } catch (error) {
-      console.log("Something went wrong", error);
+      console.log("[Attendance] Something went wrong", error);
       throw new Error(error);
     }
   }
@@ -78,7 +82,7 @@ class Attendance {
         query
       )
 
-      let message = "Not found";
+      let message = "[Attendance] Use Attendance Not found";
       
        let findRows=[]
        let affectedRows=false
@@ -86,13 +90,13 @@ class Attendance {
        
        if (findRows.length>0) {
          affectedRows=true
-         message = "User already registered ";
+         message = "[Attendance] User already registered ";
        }
 
        return { findRows, message, affectedRows };
       
     } catch (error) {
-      console.log("Something went wrong: get attendance", error);
+      console.log("[Attendance] Something went wrong: get attendance", error);
       throw new Error(error);
     }
     
