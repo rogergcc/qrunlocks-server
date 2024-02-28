@@ -72,13 +72,24 @@ App.use('/api/v1/attendance', AttendaceRoute)
 // App.use('/user', User);
 // App.use(versionOne('attendance'), AttendaceRoute)
 App.post("/sendMessage", async (req, res, next) => {
-  console.log("sendMessage: " + req.body);
-  const { chat_id, text } = req.body;
-
-  // bot.telegram.sendMessage(ctx.chat.id, "Bienvenido al Bot POKEmons");
-  const sendInfo= await bot.telegram.sendMessage(chat_id, "[DEV] sendMessage() " + text);
   
-  res.send({ status: "enviado sendmessage" });
+  try {
+    console.log("sendMessage(): " + JSON.stringify(req.body));
+
+    const { chat_id, text } = req.body;
+
+    // bot.telegram.sendMessage(ctx.chat.id, "Bienvenido al Bot POKEmons");
+    const sendInfo = await bot.telegram.sendMessage(
+      chat_id,
+      "[DEV] sendMessage() " + text
+    );
+
+    res.send({ message: sendInfo });
+    
+  } catch (error) {
+    console.log("sendMessage() error: "+JSON.stringify(error))
+    res.status(400).send({ message: error.message });
+  }
 });
 
 App.post("/verificar", (req, res, next) => {
@@ -87,7 +98,8 @@ App.post("/verificar", (req, res, next) => {
 
   // bot.telegram.sendMessage(ctx.chat.id, "Bienvenido al Bot POKEmons");
   bot.telegram.sendMessage(chat_id, "MSG local DEV verificar" + text);
-  res.send({ status: "enviado verificado" });
+  res.send({ status: "verificar enviado verificado" });
+
 });
 
 
