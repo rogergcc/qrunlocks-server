@@ -76,17 +76,17 @@ exports.findAll = async (req, res) => {
   const title = req.query.title;
   try {
     const attendaceGetAll = await Attendance.getAll(title);
-    if (attendaceGetAll.affectedRows) response.status = 200;
-    else response.status = 404;
 
+    response.status = 200;
     response.message = attendaceGetAll.message;
     response.body = attendaceGetAll;
 
     return res.status(response.status).send(response);
   } catch (error) {
-    response.status = 500;
-    console.log("Something went wrong", error);
-    response.message = error.message;
+    // console.log("[Attendace.controller]" +(error.message));
+    response.status = 500
+    response.message = error.message
+    return res.status(response.status).send(response);
   }
 
   // Attendance.getAll(title, (err, data) => {

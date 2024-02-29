@@ -10,7 +10,6 @@ class User {
   }
   static async create(newUser) {
    
-
     try {
       const result = await connectionDb.query(
          `INSERT INTO user 
@@ -19,12 +18,12 @@ class User {
             ('${newUser.chat_id}', '${newUser.first_name}', '${newUser.last_name}')`
        );
    
-       let message = "Error in creating user"
-
-       
+       let message = "";
 
        if (result.affectedRows) {
          message = "user created successfully";
+       } else {
+         message = "Error in creating user";
        }
    
        return { result,message };
@@ -40,9 +39,9 @@ class User {
     let message = ""
    try {
      console.log('[user.model] findById INIT')
-      console.log('query')
+    
       const query = `SELECT * FROM user WHERE chat_id = '${chat_id}'`
-      console.log(query);
+      console.log('query :'+ query);
       const result = await connectionDb.query(query)
 
       console.log('result')
@@ -57,15 +56,16 @@ class User {
        }
        else{
          affectedRows=false
-         message = "User not Found";
+         message = "[User] not Found";
        }
    
        return { findRows,message,affectedRows };
     } catch (error) {
-  
-      message = `something ocurre finding user: ${error.message}`
-      // throw new Error(error);
-      return { findRows, message,affectedRows }
+      
+      console.log("[user] Something went wrong finding user"+ error.message);
+      message = `Something ocurre finding user: ${error.message}`
+      throw new Error(error);
+      // return { findRows, message,affectedRows }
     }
 
    

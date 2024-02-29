@@ -9,6 +9,8 @@ const TOKEN = process.env.BOT_TOKEN
 const HOST= process.env.HOST
 const App = express();
 const AttendaceRoute = require('./routes/attendance.routes')
+
+const UserRoute = require('./routes/user.routes')
 App.use(express.static(path.join(__dirname, "../public")));
 
 // var corsOptions = {
@@ -66,9 +68,10 @@ App.post("/webhooks/telegram", (req, res, next) => {
 });
 
 // require("./routes/attendance.routes.js")(App);
-require("./routes/user.routes.js")(App)
+// require("./routes/user.routes.js")(App)
 
 App.use('/api/v1/attendance', AttendaceRoute)
+App.use('/api/v1/users', UserRoute)
 // App.use('/user', User);
 // App.use(versionOne('attendance'), AttendaceRoute)
 App.post("/sendMessage", async (req, res, next) => {
