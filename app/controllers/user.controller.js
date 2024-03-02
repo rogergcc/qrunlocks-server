@@ -61,9 +61,10 @@ module.exports.create = async (req) => {
    
     return response
   } catch (error) {
-    console.log("Something went wrong", error);
+    console.log("user controller Something went wrong", error);
     response.message = error.message;
     return response
+    
   }
   
 };
@@ -87,6 +88,7 @@ exports.findAll = async (req, res) => {
     response.status = 500;
     console.log("Something went wrong", error);
     response.message = error.message;
+    return res.status(response.status).send(response);
   }
   
   // await User.getAll(title, (err, data) => {

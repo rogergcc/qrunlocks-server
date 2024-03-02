@@ -62,7 +62,7 @@ class User {
        return { findRows,message,affectedRows };
     } catch (error) {
       
-      console.log("[user] Something went wrong finding user"+ error.message);
+      console.log("[user.model] Something went wrong finding user"+ error.message);
       message = `Something ocurre finding user: ${error.message}`
       throw new Error(error);
       // return { findRows, message,affectedRows }

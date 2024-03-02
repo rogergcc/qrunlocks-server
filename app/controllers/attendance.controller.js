@@ -24,7 +24,7 @@ module.exports.create = async (req, res) => {
     console.log('userExists'+ JSON.stringify(userFounded))
     
     if (userFounded.affectedRows==false) {
-      response.status = 404;
+    
       response.message = userFounded.message;
 
       response.body = userFounded;
@@ -32,6 +32,7 @@ module.exports.create = async (req, res) => {
       // return response;
       return res.status(response.status).send(response);
     }
+
     //#endregion
     
 
@@ -120,6 +121,7 @@ exports.findOne = async (req, res) => {
     response.status = 500;
     console.log("Something went wrong", error);
     response.message = error.message;
+    return res.status(response.status).send('response');
   }
 
   // Attendance.findByChatId(req.params.id, (err, data) => {
