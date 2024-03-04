@@ -21,14 +21,15 @@ module.exports.create = async (req, res) => {
 
     //#region Verificar el USUARIO EXISTEN EN EL SISTEMA -  esta registrado ?
     const userFounded = await User.findById(requestBody.chat_id);
-    console.log('userExists'+ JSON.stringify(userFounded))
+    console.log('[atendance.controller] create() userFounded ? '+ JSON.stringify(userFounded))
     
     if (userFounded.affectedRows==false) {
-    
-      response.message = userFounded.message;
 
-      response.body = userFounded;
-      console.log("[attendance.Controller] userFounded" + JSON.stringify(userFounded))
+      response.status=404
+      response.error= "User Not Exists" 
+      response.message= userFounded.message
+      response.data = {}
+      console.log("[attendance.Controller] userFounded ?: " + JSON.stringify(userFounded))
       // return response;
       return res.status(response.status).send(response);
     }
@@ -41,9 +42,10 @@ module.exports.create = async (req, res) => {
       req.body.chat_id
     );
     if (userRegisterAttendanceFounded.affectedRows) {
-      response.status = 404;
-      response.message = userRegisterAttendanceFounded.message;
-      response.body = userRegisterAttendanceFounded;
+      response.status = 409;
+      response.error= "Attendance Conflict" 
+      response.message = `The user [${req.body.chat_id}] already has attendance recorded this event`;
+      response.data = userRegisterAttendanceFounded.findRows[0];
       return res.status(response.status).send(response);
     }
     //#endregion
@@ -53,11 +55,20 @@ module.exports.create = async (req, res) => {
       chat_id: req.body.chat_id,
       event_id: req.body.event_id,
     })
+    
 
     const responseRegisterUserAttendance = await Attendance.create(attendance);
-    response.status = 200;
-    response.message = responseRegisterUserAttendance.message;
-    response.body = responseRegisterUserAttendance;
+    const userData= userFounded.findRows[0]
+    if (responseRegisterUserAttendance.affectedRows) {
+      response.error= "Attendance Conflict" 
+      response.status = 409
+      response.message= 'Error at register attendance in Event'
+      response.data = userData  
+      return res.status(response.status).send(response);
+    }
+    response.status = 201;
+    response.message = `User [${userData.chat_id}] ${userData.last_name}, ${userData.first_name} register attendance successfully`;
+    response.data = userData
 
     return res.status(response.status).send(response);
 

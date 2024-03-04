@@ -16,14 +16,18 @@ class Attendance {
             ('${newAttendance.chat_id}', '${newAttendance.event_id}')`
       );
 
-      let message = "Error at register attendance in Event";
+      let message = "";
       if (result.affectedRows) {
-        message = "register attendance successfully";
+        message = "Register attendance successfully"
+      }else{
+        message = 'Error at register attendance in Event'
       }
-
+      console.log('..............');
+      console.log("[Attendance] create() result " + JSON.stringify(result))
+      console.log('..............');
       return { result, message };
     } catch (error) {
-      console.log("Something went wrong: created event", error);
+      console.log("[Attendance] create() Something went wrong: created event", error);
       throw new Error(error);
     }
   }
@@ -55,11 +59,11 @@ class Attendance {
 
       if (findRows.length > 0) {
         affectedRows = true;
-        message = "[Attendance] User found in Attendace Register";
+        message = `User [${chat_id}] found in Attendace`;
       }
       else{
         affectedRows=false
-        message= '[Attendance] User Not found in Attendace Register'
+        message= '[Attendance] User Not found in Attendace '
       }
 
       return { findRows, message, affectedRows };

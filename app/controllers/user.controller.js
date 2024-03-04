@@ -53,7 +53,7 @@ module.exports.create = async (req) => {
     const responseCreateUser = await User.create(newUser)
     // console.log('=>Controller responseCreateUser'+ JSON.stringify(responseCreateUser))
 
-    response.status = 200
+    response.status = 201 
     response.message = responseCreateUser.message
     // response.affectedRows=1
     response.body = responseCreateUser

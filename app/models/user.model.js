@@ -56,9 +56,9 @@ class User {
        }
        else{
          affectedRows=false
-         message = "[User] not Found";
+         message = `User [${chat_id}] not Found`;
        }
-   
+       console.log("[user.model] findById():" + JSON.stringify(findRows))
        return { findRows,message,affectedRows };
     } catch (error) {
       
