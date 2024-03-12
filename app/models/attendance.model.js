@@ -16,14 +16,18 @@ class Attendance {
             ('${newAttendance.chat_id}', '${newAttendance.event_id}')`
       );
 
-      let message = "Error at register attendance in Event";
+      let message = "";
       if (result.affectedRows) {
-        message = "register attendance successfully";
+        message = "Register attendance successfully"
+      }else{
+        message = 'Error at register attendance in Event'
       }
-
+      console.log('..............');
+      console.log("[Attendance] create() result " + JSON.stringify(result))
+      console.log('..............');
       return { result, message };
     } catch (error) {
-      console.log("Something went wrong: created event", error);
+      console.log("[Attendance] create() Something went wrong: created event", error);
       throw new Error(error);
     }
   }
@@ -47,7 +51,7 @@ class Attendance {
         `SELECT * FROM attendance WHERE chat_id = ${chat_id}`
       );
 
-      let message = "Not found";
+      let message = "";
 
       let findRows = [];
       let affectedRows = false;
@@ -55,45 +59,48 @@ class Attendance {
 
       if (findRows.length > 0) {
         affectedRows = true;
-        message = "User found";
+        message = `User [${chat_id}] found in Attendace`;
+      }
+      else{
+        affectedRows=false
+        message= '[Attendance] User Not found in Attendace '
       }
 
       return { findRows, message, affectedRows };
     } catch (error) {
-      console.log("Something went wrong", error);
+      console.log("[Attendance] Something went wrong", error);
       throw new Error(error);
     }
   }
 
   static async getAll(title) {
-    let query = "SELECT * FROM attendance";
-
+  
+    let message = "";
+    let findRows = [];
+    let affectedRows = false;
     // if (title) {
     //   query += ` WHERE title LIKE '%${title}%'`;
     // }
 
     try {
+      const query = "SELECT * FROM attendance";
+      const result = await connectionDb.query(query);
+      findRows = helper.emptyOrRows(result);
 
-      const result = await connectionDb.query(
-        query
-      )
+      if (findRows.length > 0) {
+        message = "[Attendance] User Attendance Founded ";
+      } else {
+        message = "[Attendance] Use Attendance(S) Not founded";
+      }
 
-      let message = "Not found";
-      
-       let findRows=[]
-       let affectedRows=false
-       findRows = helper.emptyOrRows(result);
-       
-       if (findRows.length>0) {
-         affectedRows=true
-         message = "User already registered ";
-       }
-
-       return { findRows, message, affectedRows };
-      
+      return { findRows, message };
     } catch (error) {
-      console.log("Something went wrong: get attendance", error);
+      console.log("[Attendance] Something went wrong: get attendance: ", error.message);
+      //saving logs error internally
+      error.message= '[Attendance] Some error occurred while retrieving Attendance'
+      // message = `Something happened when obtaining the attendee records : ${error.message}`
       throw new Error(error);
+      // return { findRows, message, affectedRows };
     }
     
 

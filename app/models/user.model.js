@@ -10,7 +10,6 @@ class User {
   }
   static async create(newUser) {
    
-
     try {
       const result = await connectionDb.query(
          `INSERT INTO user 
@@ -19,12 +18,12 @@ class User {
             ('${newUser.chat_id}', '${newUser.first_name}', '${newUser.last_name}')`
        );
    
-       let message = "Error in creating user"
-
-       
+       let message = "";
 
        if (result.affectedRows) {
          message = "user created successfully";
+       } else {
+         message = "Error in creating user";
        }
    
        return { result,message };
@@ -35,30 +34,43 @@ class User {
   }
 
   static async findById(chat_id) {
+    let findRows=[]
+    let affectedRows=false
+    let message = ""
    try {
-      const result = await connectionDb.query(
-         `SELECT * FROM user WHERE chat_id = ${chat_id}`
-       );
-   
-       let message = "Not found";
+     console.log('[user.model] findById INIT')
+     var chatId = (chat_id+"").trim()
+      const query = `SELECT * FROM user WHERE chat_id = '${chatId}'`
+      console.log('query :'+ query);
+      const result = await connectionDb.query(query)
+
+      console.log('result')
+      console.log(result)
       
-       let findRows=[]
-       let affectedRows=false
+      
        findRows = helper.emptyOrRows(result);
-       
+       if( chatId==""){
+         affectedRows=false
+         message="Id No giving"
+         return { findRows,message,affectedRows } 
+       }
        if (findRows.length>0) {
          affectedRows=true
-         message = "User already registered ";
+         message = "User Founded"
+         return { findRows,message,affectedRows } 
        }
-   
-       return { findRows,message,affectedRows };
+       else{
+         affectedRows=false
+         message = `User [${chatId}] not Found`
+         return { findRows,message,affectedRows } 
+       }
     } catch (error) {
-      console.log("Something went wrong: find user", error);
+      
+      console.log("[user.model] findById() Something went wrong finding user: "+ error.message);
+      message = `Something ocurre finding user: ${error.message}`
       throw new Error(error);
+      // return { findRows, message,affectedRows }
     }
-
-   
-
   }
 
   static async getAll(title) {
@@ -71,7 +83,7 @@ class User {
       }
       const result = await connectionDb.query(query)
    
-       let message = "Not found";
+       let message = "Users Not found";
       
        let findRows=[]
        let affectedRows=false
