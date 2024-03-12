@@ -39,37 +39,38 @@ class User {
     let message = ""
    try {
      console.log('[user.model] findById INIT')
-    
-      const query = `SELECT * FROM user WHERE chat_id = '${chat_id}'`
+     var chatId = (chat_id+"").trim()
+      const query = `SELECT * FROM user WHERE chat_id = '${chatId}'`
       console.log('query :'+ query);
       const result = await connectionDb.query(query)
 
       console.log('result')
       console.log(result)
       
-  
+      
        findRows = helper.emptyOrRows(result);
-       
+       if( chatId==""){
+         affectedRows=false
+         message="Id No giving"
+         return { findRows,message,affectedRows } 
+       }
        if (findRows.length>0) {
          affectedRows=true
-         message = "User Founded";
+         message = "User Founded"
+         return { findRows,message,affectedRows } 
        }
        else{
          affectedRows=false
-         message = `User [${chat_id}] not Found`;
+         message = `User [${chatId}] not Found`
+         return { findRows,message,affectedRows } 
        }
-       console.log("[user.model] findById():" + JSON.stringify(findRows))
-       return { findRows,message,affectedRows };
     } catch (error) {
       
-      console.log("[user.model] Something went wrong finding user"+ error.message);
+      console.log("[user.model] findById() Something went wrong finding user: "+ error.message);
       message = `Something ocurre finding user: ${error.message}`
       throw new Error(error);
       // return { findRows, message,affectedRows }
     }
-
-   
-
   }
 
   static async getAll(title) {

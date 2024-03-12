@@ -1,5 +1,27 @@
 const Attendance = require("../models/attendance.model.js");
 const User = require("../models/user.model.js");
+const errorMappings = require('../middleware/errorMapping.js');
+const { response } = require("express");
+
+
+const handleErrorResponse = async (error) => {
+  let response = {};
+  let errorMessage = error.message
+  let errorTypeCode =""
+
+  for (const errorType in errorMappings) {
+    if ( (error.message).includes(errorType)) {
+      errorMessage = errorMappings[errorType].message;
+      errorTypeCode = errorMappings[errorType].type;
+      break;
+    }
+  }
+  response.status = 500
+  response.message = errorMessage
+  response.error = errorTypeCode
+  response.data= {}
+  return response
+}
 
 // Create and Save a new User
 module.exports.create = async (req, res) => {
@@ -15,21 +37,16 @@ module.exports.create = async (req, res) => {
       return res.status(response.status).send(response);
     }
 
-    // Create a User
-
-    
-
     //#region Verificar el USUARIO EXISTEN EN EL SISTEMA -  esta registrado ?
     const userFounded = await User.findById(requestBody.chat_id);
     console.log('[atendance.controller] create() userFounded ? '+ JSON.stringify(userFounded))
-    
+  
     if (userFounded.affectedRows==false) {
-
       response.status=404
       response.error= "User Not Exists" 
       response.message= userFounded.message
       response.data = {}
-      console.log("[attendance.Controller] userFounded ?: " + JSON.stringify(userFounded))
+      console.log("[attendance.Controller] response ?: " + JSON.stringify(response))
       // return response;
       return res.status(response.status).send(response);
     }
@@ -74,14 +91,13 @@ module.exports.create = async (req, res) => {
 
     // return res.send(response);
   } catch (error) {
-    console.log("Something went wrong", error);
-    response.status = 500;
-    response.message = error.message;
-
+    // console.log("Something went wrong at [atendance.controller] create(): [error]" +error)
+    console.log("Something went wrong at [atendance.controller] create(): [error.message]: " +error.message)
+    const response = await handleErrorResponse( error)
     return res.status(response.status).send(response);
   }
-  // return res.status(response.status).send(response)
 };
+
 
 exports.findAll = async (req, res) => {
   let response = {};

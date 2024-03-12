@@ -88,12 +88,12 @@ class Attendance {
       findRows = helper.emptyOrRows(result);
 
       if (findRows.length > 0) {
-        message = "[Attendance] User Attendance already registered ";
+        message = "[Attendance] User Attendance Founded ";
       } else {
         message = "[Attendance] Use Attendance(S) Not founded";
       }
 
-      return { findRows, message, affectedRows };
+      return { findRows, message };
     } catch (error) {
       console.log("[Attendance] Something went wrong: get attendance: ", error.message);
       //saving logs error internally
